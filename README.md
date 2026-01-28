@@ -22,7 +22,7 @@ CoGeoAD: Hierarchical Color-Geometric Fusion with Multi-View Attention for Zero-
 ## How to Run
 
 ### Environment
-To set up the environment, please follow these steps:
+To set up the environment, please use the provided scripts:
 ```bash
    conda create -n cogeoad python=3.8
    conda activate cogeoad
@@ -53,6 +53,7 @@ python run_cross_dataset.py
 ```
 To Test:
 Set mode = 1, your dataset addness, and other parameters inside run_cross_dataset.py.
+
 Run the script:
 ```bash
 python run_cross_dataset.py
