@@ -2,9 +2,10 @@ import os
 import subprocess
 
 # clip cache
-os.environ["CLIP_CACHE_DIR"] = "/home/wxl/.cache/clip"
+os.environ["CLIP_CACHE_DIR"] = ".cache/clip"
 os.makedirs(os.environ["CLIP_CACHE_DIR"], exist_ok=True)
-
+dataset1_addr = "data/mvtec-re" # mvtec3d address
+dataset2_addr = "data/Eyecandies-re" # eyecandies address
 # ================= parameters =================
 device = 0
 mode = 0 # 0:train，1:test
@@ -18,16 +19,16 @@ features_list = list(range(21, 25))
 
 if chosen_data == 0:
     train_dataset = "mvtec3d"
-    train_data_path = "/home/wxl/data/mvtec-re"
+    train_data_path = dataset1_addr
     test_dataset = "eyecandies"
-    test_data_path = "/home/wxl/data/Eyecandies-re/"
+    test_data_path = dataset2_addr
 else:
     train_dataset = "eyecandies"
-    train_data_path = "/home/wxl/data/Eyecandies-re/"
+    train_data_path = dataset2_addr
     test_dataset = "mvtec3d"
-    test_data_path = "/home/wxl/data/mvtec-re/"
+    test_data_path = dataset1_addr
 
-# 4. prompt
+
 depth = [9]
 n_ctx = [12]
 t_n_ctx = [4]
