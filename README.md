@@ -20,7 +20,7 @@ CoGeoAD: Hierarchical Color-Geometric Fusion with Multi-View Attention for Zero-
 </p>
 
 ## How to Run
-Download the dataset below:
+
 ### Environment
 To set up the environment, please follow these steps:
 ```bash
