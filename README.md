@@ -5,17 +5,17 @@ CoGeoAD: Hierarchical Color-Geometric Fusion with Multi-View Attention for Zero-
 ## Motivation
 <p align="center">
   <a href="assets/fig1-1.png">
-    <img src="assets/motivation-1.png" width="56%" alt="Click to view "/>
+    <img src="assets/fig1-1.png" width="56%" alt="Click to view "/>
   </a>
   <a href="assets/fig1-2.png">
-    <img src="assets/motivation-2.png" width="42%" alt="Click to view "/>
+    <img src="assets/fig1-2.png" width="42%" alt="Click to view "/>
   </a>
 </p>
 
 ## Overview of CoGeoAD
 <p align="center">
   <a href="assets/fig2.png">
-    <img src="assets/overview.png" width="90%" alt="Click to view "/>
+    <img src="assets/fig2.png" width="90%" alt="Click to view "/>
   </a>
 </p>
 
