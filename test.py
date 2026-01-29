@@ -1,4 +1,4 @@
-import AnomalyCLIP_lib
+import CoGeoAD_CLIP_lib
 import torch
 import argparse
 import torch.nn.functional as F
@@ -81,7 +81,7 @@ def test(args):
 
     AnomalyCLIP_parameters = {"Prompt_length": args.n_ctx, "learnabel_text_embedding_depth": args.depth, "learnabel_text_embedding_length": args.t_n_ctx}
     
-    model, _ = AnomalyCLIP_lib.load("ViT-L/14@336px", device=device, design_details = AnomalyCLIP_parameters)
+    model, _ = CoGeoAD_CLIP_lib.load("ViT-L/14@336px", device=device, design_details = AnomalyCLIP_parameters)
     model.eval()
 
     preprocess, target_transform, target_transform_pc = get_transform(args)
@@ -218,24 +218,24 @@ def test(args):
                 for i in range(len(rgb_fused_features_groups)):
                     rgb_patch_feature = rgb_fused_features_groups[i]
                     rgb_patch_feature = rgb_patch_feature / rgb_patch_feature.norm(dim=-1, keepdim=True)
-                    rgb_similarity, _ = AnomalyCLIP_lib.compute_similarity(rgb_patch_feature, text_features[0])
-                    rgb_similarity_map = AnomalyCLIP_lib.get_similarity_map(rgb_similarity[:, 1:, :], args.image_size)
+                    rgb_similarity, _ = CoGeoAD_CLIP_lib.compute_similarity(rgb_patch_feature, text_features[0])
+                    rgb_similarity_map = CoGeoAD_CLIP_lib.get_similarity_map(rgb_similarity[:, 1:, :], args.image_size)
                     similarity_maps_rgb.append(rgb_similarity_map)
             
             if args.feature_type in ['uni', 'both']:
                 for i in range(len(uni_fused_features_groups)):
                     uni_patch_feature = uni_fused_features_groups[i]
                     uni_patch_feature = uni_patch_feature / uni_patch_feature.norm(dim=-1, keepdim=True)
-                    uni_similarity, _ = AnomalyCLIP_lib.compute_similarity(uni_patch_feature, text_features[0])
-                    uni_similarity_map = AnomalyCLIP_lib.get_similarity_map(uni_similarity[:, 1:, :], args.image_size)
+                    uni_similarity, _ = CoGeoAD_CLIP_lib.compute_similarity(uni_patch_feature, text_features[0])
+                    uni_similarity_map = CoGeoAD_CLIP_lib.get_similarity_map(uni_similarity[:, 1:, :], args.image_size)
                     similarity_maps_uni.append(uni_similarity_map)
                 
 
             for i in range(len(color_fused_features_groups)):
                 color_patch_feature = color_fused_features_groups[i]
                 color_patch_feature = color_patch_feature / color_patch_feature.norm(dim=-1, keepdim=True)
-                color_similarity, _ = AnomalyCLIP_lib.compute_similarity(color_patch_feature, text_features[0])
-                color_similarity_map = AnomalyCLIP_lib.get_similarity_map(color_similarity[:, 1:, :], args.image_size)
+                color_similarity, _ = CoGeoAD_CLIP_lib.compute_similarity(color_patch_feature, text_features[0])
+                color_similarity_map = CoGeoAD_CLIP_lib.get_similarity_map(color_similarity[:, 1:, :], args.image_size)
                 similarity_maps_color.append(color_similarity_map)
             
             if args.feature_type == 'rgb':

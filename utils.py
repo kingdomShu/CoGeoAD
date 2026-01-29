@@ -1,7 +1,7 @@
 import torchvision.transforms as transforms
 # from torchvision.transforms import Compose, Resize, ToTensor, Normalize, InterpolationMode
-from AnomalyCLIP_lib.transform import image_transform
-from AnomalyCLIP_lib.constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
+from CoGeoAD_CLIP_lib.transform import image_transform
+from CoGeoAD_CLIP_lib.constants import OPENAI_DATASET_MEAN, OPENAI_DATASET_STD
 
 
 
