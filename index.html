@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoGeoAD | Zero-Shot 3D Anomaly Detection</title>
+    <style>
+        /* 鹰角风格色彩与排版基础 */
+        :root {
+            --bg-color: #f4f4f4;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --accent: #00A6FF; /* 机能亮蓝 */
+            --accent-star: #FFD700; /* Star专属亮黄 */
+            --dark-block: #1e1e1e;
+        }
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* 顶部机能风 Header */
+        header {
+            background-color: var(--dark-block);
+            color: #fff;
+            padding: 50px 5%;
+            position: relative;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%);
+        }
+        .header-tag {
+            font-weight: 800;
+            font-size: 0.9rem;
+            letter-spacing: 2px;
+            color: var(--accent);
+            text-transform: uppercase;
+        }
+        h1 {
+            font-size: 3.5rem;
+            margin: 10px 0;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            color: #aaaaaa;
+            max-width: 800px;
+            margin-bottom: 30px;
+        }
+
+        /* ----- 头部动作按钮 (代码 & Star) ----- */
+        .header-actions {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            position: relative;
+            /* 标志性机能风斜切角 */
+            clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
+        }
+        .action-btn .icon {
+            margin-right: 8px;
+            font-size: 1.2rem;
+        }
+        
+        /* 代码按钮 */
+        .btn-code {
+            background-color: var(--accent);
+            color: #000;
+        }
+        .btn-code:hover {
+            background-color: #fff;
+            color: #000;
+            transform: translateX(5px);
+        }
+
+        /* Star按钮 */
+        .btn-star {
+            background-color: #2a2a2a; /* 深灰底色 */
+            color: var(--accent-star);
+            border-left: 4px solid var(--accent-star); /* 左侧高亮色带 */
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%);
+        }
+        .btn-star:hover {
+            background-color: var(--accent-star);
+            color: #000;
+            transform: translateX(5px);
+        }
+        /* ------------------------------------------- */
+
+        /* 演示区主容器 */
+        .demo-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 5%;
+            gap: 40px;
+        }
+
+        /* 左侧导航栏 */
+        .sidebar {
+            flex: 0 0 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .nav-btn {
+            background: #fff;
+            border: 2px solid var(--text-main);
+            padding: 15px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: left;
+            cursor: pointer;
+            text-transform: uppercase;
+            position: relative;
+            transition: all 0.2s;
+            clip-path: polygon(0 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+        }
+        .nav-btn:hover {
+            background: var(--text-muted);
+            color: #fff;
+        }
+        .nav-btn.active {
+            background: var(--text-main);
+            color: var(--accent);
+            border-color: var(--text-main);
+        }
+        .nav-btn.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background-color: var(--accent);
+        }
+
+        /* 右侧内容展示区 */
+        .content-area {
+            flex: 1;
+            background: #fff;
+            padding: 40px;
+            border: 1px solid #ddd;
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.05);
+            position: relative;
+        }
+        .content-area::after {
+            content: '/// SYS.OVERRIDE';
+            position: absolute;
+            bottom: -25px;
+            right: 0;
+            font-weight: 800;
+            color: #ccc;
+            font-size: 0.8rem;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-size: 2rem;
+            border-bottom: 4px solid var(--text-main);
+            padding-bottom: 10px;
+            margin-top: 0;
+            text-transform: uppercase;
+        }
+        p {
+            font-size: 1.2rem;
+            line-height: 1.7;
+        }
+        .highlight-text {
+            background: var(--text-main);
+            color: #fff;
+            padding: 2px 6px;
+            font-weight: bold;
+        }
+        
+        /* 图片容器自适应高度 */
+        .image-box {
+            width: 100%;
+            height: auto; 
+            background: transparent;
+            border: 2px dashed #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-weight: bold;
+            margin: 15px 0; 
+            padding: 10px; 
+            overflow: hidden;
+        }
+        
+        /* 针对公式这种较小图片的高度特殊设置 */
+        .formula-box {
+            height: auto; 
+            margin: 5px 0; 
+            border: none;
+            padding: 5px;
+        }
+        
+        .image-box img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-tag">PROJECT // ICML 2026</div>
+    <h1>CoGeoAD</h1>
+    <div class="subtitle">
+        Hierarchical Color-Geometric Fusion with Multi-View Attention for Zero-Shot 3D Anomaly Detection<br><br>
+        <span style="font-size: 1rem;">Ke Xu, Xinle Wang, Yanning Hou, Xueliang Ma, Juan Xie, Jianfeng Qiu | Anhui University | kingdom_shu@qq.com</span>
+    </div>
+    
+    <div class="header-actions">
+        <a href="https://github.com/kingdomShu/CoGeoAD" target="_blank" class="action-btn btn-code">
+            <span class="icon">◩</span> SOURCE CODE
+        </a>
+        <a href="https://github.com/kingdomShu/CoGeoAD" target="_blank" class="action-btn btn-star">
+            <span class="icon">★</span> STAR PROJECT
+        </a>
+    </div>
+</header>
+
+<div class="demo-container">
+    <div class="sidebar">
+        <button class="nav-btn active" onclick="switchTab(event, 'overview')">01. Overview</button>
+        <button class="nav-btn" onclick="switchTab(event, 'framework')">02. Framework</button>
+        <button class="nav-btn" onclick="switchTab(event, 'modules')">03. Modules</button>
+        <button class="nav-btn" onclick="switchTab(event, 'results')">04. Results</button>
+    </div>
+
+    <div class="content-area">
+        <div id="overview" class="tab-content active">
+            <h2>Overview</h2>
+            <p>Current single-modality zero-shot 3D anomaly detection faces limitations. As illustrated in the figure below, 3D-only models miss color and texture defects, while 2D-only models overlook structural damages, highlighting a strong visual complementarity between modalities.</p>
+            <p>To overcome this unimodal perception blind spot, this paper proposes a unified framework named <span class="highlight-text">CoGeoAD</span>. By effectively synergizing color and geometric representations across multiple views, this framework can accurately capture and localize two distinct types of anomalies—texture and structure—within a single model.</p>
+            <p>This deep color and geometry fusion strategy significantly outperforms traditional unimodal baseline methods and simple feature concatenation schemes in detection performance.</p>
+            <div class="image-box" style="border: none;">
+                <img src="img/mot.svg" alt="Motivation">
+            </div>
+        </div>
+
+        <div id="framework" class="tab-content">
+            <h2>Framework</h2>
+            <p>As illustrated in figure, CoGeoAD is a zero-shot framework designed to bridge the domain gap by synergizing 2D semantic priors with 3D geometric representations. The pipeline comprises three integral modules: (1) Color-Geometric Multi-View Point Cloud Render, which establishes pixel-wise correspondences between RGB images and point clouds to generate chromatic and geometric views. (2) Data-Driven Multi-View Attention (MVA), which utilizes a lightweight CNN-based Pixel Encoder to dynamically compute attention scores from multi-view images, ensuring that informative viewpoints are prioritized; and (3) Multi-Stage CoGeo Fusion (MS-CGF), which hierarchically aggregates multi-level features and computes text-image similarities to generate anomaly maps.</p>
+            <div class="image-box" style="border: none;">
+                <img src="img/main.svg" alt="Main Architecture">
+            </div>
+        </div>
+
+        <div id="modules" class="tab-content">
+            <h2>Key Modules</h2>
+            
+            <div class="image-box" style="border: none;">
+                <img src="img/main.svg" alt="Main Architecture">
+            </div>
+            
+            <p><strong>Step 1: Color-Geometric Multi-View Point Cloud Render</strong></p>
+            <p>This foundational preprocessing module bridges the gap between 2D anomaly detection and the 3D domain. It explicitly decouples geometry from color by rendering point clouds into paired multi-view images—one capturing geometric structures and the other capturing chromatic textures.</p>
+            <p>The framework generates multi-view representations by rotating the point cloud, utilizing a composite rotation matrix:</p>
+            
+            <div class="image-box formula-box">
+                <img src="img/l1.svg" alt="Rotation Matrix Formula">
+            </div>
+
+            <p>To establish precise point-to-pixel correspondences and filter out occluded noise, so it applies a geometric consistency check using a visibility indicator for points:</p>
+            
+            <div class="image-box formula-box">
+                <img src="img/l2.svg" alt="Geometric Consistency Formula">
+            </div>
+
+            <p><strong>Step 2: Data-Driven Multi-View Attention (MVA)</strong></p>
+            <p>The MVA module dynamically calculates importance scores for each rendered 2D view, prioritizing informative perspectives to prevent subtle anomaly cues from being overshadowed by irrelevant background views.</p>
+            <p>A lightweight CNN-based pixel encoder extracts and maps spatial features into a latent embedding:</p>
+            
+            <div class="image-box formula-box">
+                <img src="img/l3.svg" alt="Latent Embedding Formula">
+            </div>
+
+            <p>To adaptively weigh the contribution of each view, we employ a data-driven attention mechanism parameterized by a scoring network. To prevent the attention mechanism from trivially collapsing onto a single view, an entropy loss term is applied during training to encourage distributional smoothness:</p>
+            
+            <div class="image-box formula-box">
+                <img src="img/l4.svg" alt="Attention Score Formula" style="margin-bottom: 10px;">
+                <img src="img/l5.svg" alt="Entropy Loss Formula">
+            </div>
+            
+            <div class="image-box" style="border: none;">
+                <img src="img/vis1.svg" alt="Multi-View Anomaly Maps">
+            </div>
+            
+            <p><strong>Step 3: Multi-Stage Color-Geometric Fusion (MS-CGF)</strong></p>
+            <p>The MS-CGF module hierarchically aggregates multi-level features across four distinct dimensions: feature depth, semantic similarity, view, and modality. To capture fine-grained details, intermediate CLIP layers are grouped and dynamically fused using an MLP-based selector:</p>
+            
+            <div class="image-box formula-box">
+                <img src="img/l6.svg" alt="Layer Selection Formula">
+            </div>
+
+            <p>Anomaly detection is performed at each semantic depth independently by computing the cosine similarity between the fused feature map and the text embedding:</p>
+            
+            <div class="image-box formula-box">
+                <img src="img/l7.svg" alt="Cosine Similarity Formula">
+            </div>
+
+            <p>Ultimately, the parallel geometric and color streams are fused using an element-wise maximization strategy to generate the final point cloud anomaly score, ensuring high sensitivity to both structural and textural defects:</p>
+            
+            <div class="image-box formula-box">
+                <img src="img/l8.svg" alt="Final Anomaly Score Formula">
+            </div>
+        </div>
+
+        <div id="results" class="tab-content">
+            <h2>Performance</h2>
+            <div class="image-box" style="border: none;">
+                <img src="img/vis2.svg" alt="Average Fusion Visuals">
+            </div>
+            <p>Quantitative comparison with state-of-the-art methods on MVTec3D-AD and Eyecandies datasets. We include recent unsupervised multimodal methods such as BridgeNet as reference upper bounds, and recent zero-shot CLIP-based methods such as GS-CLIP for direct comparison.</p>
+            
+            <div class="image-box" style="border: none;">
+                <img src="img/e1.svg" alt="Table 1: Main Results">
+            </div>
+
+            <p>Ablation study on key components of CoGeoAD on MVTec3D-AD and Eyecandies datasets.</p>
+            
+            <div class="image-box" style="border: none;">
+                <img src="img/e2.svg" alt="Table 2: Ablation Study">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 1. 选项卡切换逻辑
+    function switchTab(evt, tabName) {
+        let i, tabcontent, navbtns;
+        
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].classList.remove("active");
+        }
+        
+        navbtns = document.getElementsByClassName("nav-btn");
+        for (i = 0; i < navbtns.length; i++) {
+            navbtns[i].classList.remove("active");
+        }
+        
+        document.getElementById(tabName).classList.add("active");
+        evt.currentTarget.classList.add("active");
+    }
+
+    // 2. 获取 GitHub Star 数量逻辑
+    async function fetchGitHubStars() {
+        const repoPath = "kingdomShu/CoGeoAD"; 
+        const apiUrl = `https://api.github.com/repos/${repoPath}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            if (response.ok) {
+                const data = await response.json();
+                const starCount = data.stargazers_count;
+                
+                const starBtn = document.querySelector('.btn-star');
+                if (starBtn && starCount !== undefined) {
+                    starBtn.innerHTML = `<span class="icon">★</span> STAR PROJECT [ ${starCount} ]`;
+                }
+            }
+        } catch (error) {
+            console.error("Failed to fetch GitHub stars:", error);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", fetchGitHubStars);
+</script>
+
+</body>
+</html>
