@@ -38,7 +38,7 @@ We prepare the rendering datasets of MVTecAD-3D and Eyecandies below.
 |Dataset|Original version|Rendering version|
 |:---:|:---:|:---:|
 |MVTec3D-AD|[Ori](https://huggingface.co/datasets/CoGeoAD/CoGeoAD-data/blob/main/MVTec3D.zip)|[Render](https://huggingface.co/datasets/CoGeoAD/CoGeoAD-data/blob/main/mvtec-re.zip)|
-|Eyecandies|[Ori](https://huggingface.co/datasets/CoGeoAD/CoGeoAD-data/blob/main/Eyecandies.zip)|[Render](https://huggingface.co/datasets/CoGeoAD/CoGeoAD-data/blob/main/Eyecandies-re.zip)|
+|Eyecandies|[Ori](https://huggingface.co/datasets/CoGeoAD/CoGeoAD-data/blob/main/Eyecandies.7z)|[Render](https://huggingface.co/datasets/CoGeoAD/CoGeoAD-data/blob/main/Eyecandies-re.7z)|
 
 If you prefer to generate the data yourself, use the provided scripts:
 
